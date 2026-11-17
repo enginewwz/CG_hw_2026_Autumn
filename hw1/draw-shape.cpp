@@ -34,13 +34,13 @@ void display()
     glLineWidth(2.0f);
 
     glColor3f(0.0f, 1.0f, 0.0f);
-    drawTriangle(100, 100, 200, 200, 300, 500, GL_TRIANGLE_FAN);
+    drawTriangle(100, 100, 200, 200, 300, 500, FILLED);
 
     glColor3f(1.0f, 0.0f, 0.0f);
-    drawRect(300, 500, 400, 200, GL_TRIANGLE_FAN);
+    drawRect(300, 500, 400, 200, FILLED);
 
     glColor3f(0.0f, 0.0f, 1.0f);
-    drawCircle(600, 300, 50, 200, GL_TRIANGLE_FAN);
+    drawCircle(600, 300, 50, 200, FILLED);
 
     glColor3f(1.0f, 1.0f, 1.0f);
     drawRoundRect(600, 100, 700, 200, 10, 0, 20);
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowPosition(10, 10);
     glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-    glutCreateWindow("line & arc drawing practice");
+    glutCreateWindow("shape drawing practice");
 
     init();
 

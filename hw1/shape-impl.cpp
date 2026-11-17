@@ -1,8 +1,9 @@
 #include "line-and-arc.h"
 #include "shape.h"
 
-void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int mode)
+void drawTriangle(double x1, double y1, double x2, double y2, double x3, double y3, int filled)
 {
+    int mode = filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP;
     glBegin(mode);
         glVertex2d(x1, y1);
         glVertex2d(x2, y2);
@@ -10,8 +11,9 @@ void drawTriangle(double x1, double y1, double x2, double y2, double x3, double 
     glEnd();
 }
 
-void drawRect(double x1, double y1, double x2, double y2, int mode)
+void drawRect(double x1, double y1, double x2, double y2, int filled)
 {
+    int mode = filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP;
     glBegin(mode);
         glVertex2d(x1, y1);
         glVertex2d(x1, y2);
@@ -20,8 +22,9 @@ void drawRect(double x1, double y1, double x2, double y2, int mode)
     glEnd();
 }
 
-void drawCircle(double x, double y, double r, int num, int mode)
+void drawCircle(double x, double y, double r, int num, int filled)
 {
+    int mode = filled ? GL_TRIANGLE_FAN : GL_LINE_STRIP;
     drawArc(x, y, 0, 2 * M_PI, r, mode, num);
 }
 
