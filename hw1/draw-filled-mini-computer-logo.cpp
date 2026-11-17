@@ -81,7 +81,7 @@ int main(int argc, char** argv)
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowPosition(10, 10);
     glutInitWindowSize(WIN_WIDTH, WIN_HEIGHT);
-    glutCreateWindow("not-filled mini-computer logo drawing practice");
+    glutCreateWindow("filled mini-computer logo drawing practice");
 
     init();
 
