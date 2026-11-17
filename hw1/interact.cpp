@@ -9,9 +9,6 @@
 typedef struct node
 {
     int type;
-    #define LINE 0
-    #define RECT 1
-    #define TRIANGE 2
     int filled; // 0 or 1
     float line_width;   // 3/5/10
     double color[3];    // red/green/blue/white
@@ -20,13 +17,12 @@ typedef struct node
 }
 node_t;
 
-struct node *head = NULL;
-struct node tmp;
-double color[3] = {1.0, 1.0, 1.0};
-double param[6];
-int filled = 0;
-int type = LINE;
-float line_width = 1;
+enum Shape
+{
+    LINE = 0,
+    RECT,
+    TRIANGLE
+};
 
 enum MenuOptions 
 {
@@ -53,14 +49,20 @@ enum DrawState {
     WAITING_THIRD_POINT // triangle-use
 };
 
+struct node *head = NULL;
+struct node tmp;
+double color[3] = {1.0, 1.0, 1.0};
+int filled = 0;
+int type = LINE;
+float line_width = 1;
+
 int state = IDLE;
 
 void draw(node_t* p)
 {
-    int type = p->type;
     glColor3dv(p->color);
     glLineWidth(p->line_width);
-    switch (type)
+    switch (p->type)
     {
         case LINE:
             drawLine(p->param[0], p->param[1], p->param[2], p->param[3]);
@@ -68,7 +70,7 @@ void draw(node_t* p)
         case RECT:
             drawRect(p->param[0], p->param[1], p->param[2], p->param[3], p->filled);
             break;
-        case TRIANGE:
+        case TRIANGLE:
             if (p == &tmp && state == DRAGGING_LINE)
                 drawLine(p->param[0], p->param[1], p->param[2], p->param[3]);
             else 
@@ -77,15 +79,10 @@ void draw(node_t* p)
     }
 }
 
-void inline apply_node(node_t* p)
-{
-    memcpy(p->param, param, sizeof(*param) * 6);
-}
-
 void init_tmp()
 {
     tmp.type = type;
-    memcpy(&tmp.color, color, sizeof(*color) * 3);
+    memcpy(&tmp.color, color, sizeof(color));
     tmp.filled = filled;
     tmp.line_width = line_width;
     tmp.next = NULL;
@@ -134,12 +131,13 @@ void clear()
     }
 }
 
-void redo()
+void undo()
 {
     if (!head) return;
     node_t *p = head, *q;
     for (; p->next; q = p, p = p->next);
-    q->next = NULL;
+    if (p == head) head = NULL;
+    else q->next = NULL;
     free(p);
 }
 
@@ -163,7 +161,7 @@ void processMenuEvents(int option)
             type = LINE;
             break;
         case SHAPE_TRIANGLE:
-            type = TRIANGE;
+            type = TRIANGLE;
             break;
         case SHAPE_RECT:
             type = RECT;
@@ -184,7 +182,7 @@ void processMenuEvents(int option)
             filled = NOT_FILLED;
             break;
         case MENU_UNDO:
-            redo();
+            undo();
             break;
         case MENU_CLEAR:
             clear();
@@ -218,7 +216,7 @@ void createGLUTMenus()
     glutAddMenuEntry("filled", MODE_FILLED);
     glutAddMenuEntry("not filled", MODE_NOT_FILLED);
 
-    int mainMenu = glutCreateMenu(processMenuEvents);
+    glutCreateMenu(processMenuEvents);
     glutAddSubMenu("color", colorSubMenu);
     glutAddSubMenu("shape", shapeSubMenu);
     glutAddSubMenu("line width", linewidthSubMenu);
@@ -230,12 +228,12 @@ void createGLUTMenus()
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
 
-void mouseButton(int button, int bottom_state, int x, int y) {
+void mouseButton(int button, int botton_state, int x, int y) {
     if (button != GLUT_LEFT_BUTTON) return;
 
     if (state == IDLE) 
     {
-        if (bottom_state == GLUT_DOWN) 
+        if (botton_state == GLUT_DOWN) 
         {
             init_tmp();
             tmp.param[0] = x;
@@ -247,17 +245,17 @@ void mouseButton(int button, int bottom_state, int x, int y) {
     } 
     else if (state == DRAGGING_LINE) 
     {
-        if (bottom_state == GLUT_UP) 
+        if (botton_state == GLUT_UP) 
         {
             tmp.param[2] = x;
             tmp.param[3] = y;
             
-            float dist = std::hypot(tmp.param[0] - x, tmp.param[1] - y);
+            double dist = std::hypot(tmp.param[0] - x, tmp.param[1] - y);
             if (dist < 5.0f) 
             {
                 state = IDLE;
             } else {
-                if (tmp.type == TRIANGE) 
+                if (tmp.type == TRIANGLE) 
                 {
                     tmp.param[4] = x;
                     tmp.param[5] = y;
@@ -274,7 +272,7 @@ void mouseButton(int button, int bottom_state, int x, int y) {
     } 
     else if (state == WAITING_THIRD_POINT) 
     {
-        if (bottom_state == GLUT_DOWN) {
+        if (botton_state == GLUT_DOWN) {
             tmp.param[4] = x;
             tmp.param[5] = y;
             add_node();
